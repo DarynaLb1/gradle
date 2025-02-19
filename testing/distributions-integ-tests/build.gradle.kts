@@ -24,9 +24,17 @@ dependencies {
     integTestDistributionRuntimeOnly(projects.distributionsFull)
 }
 
+// This LazyString makes sure we do not invalidate CC entries when head commit changes
+// The hack is needed because Gradle does not support `Provider<?>` in systemProperty
+// See https://github.com/gradle/gradle/issues/12247
+class LazyString(private val source: Lazy<String>) : java.io.Serializable {
+    constructor(source: Provider<String>) : this(lazy(source::get))
+    override fun toString() = source.value
+}
+
 tasks.forkingIntegTest {
-    systemProperty("gradleBuildBranch", buildBranch.get())
-    systemProperty("gradleBuildCommitId", buildCommitId.get())
+    systemProperty("gradleBuildBranch", LazyString(buildBranch))
+    systemProperty("gradleBuildCommitId", LazyString(buildCommitId))
 }
 tasks.isolatedProjectsIntegTest {
     enabled = false
