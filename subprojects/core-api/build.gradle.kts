@@ -6,16 +6,17 @@ description = "Public and internal 'core' Gradle APIs that are required by other
 
 errorprone {
     disabledChecks.addAll(
-        "InlineMeSuggester", // 1 occurrences
-        "MalformedInlineTag", // 3 occurrences
-        "MixedMutabilityReturnType", // 3 occurrences
-        "NonApiType", // 1 occurrences
-        "ReferenceEquality", // 2 occurrences
-        "StringCharset", // 1 occurrences
+        "InlineMeSuggester", 
+        "MalformedInlineTag", 
+        "MixedMutabilityReturnType", 
+        "NonApiType", 
+        "ReferenceEquality", 
+        "StringCharset"
     )
 }
 
 dependencies {
+    // API dependencies (exposed to consumers)
     compileOnly(libs.jetbrainsAnnotations)
 
     api(projects.stdlibJavaExtensions)
@@ -33,6 +34,7 @@ dependencies {
     api(libs.ant)
     api(libs.inject)
 
+    // Implementation dependencies (internal usage)
     implementation(projects.io)
     implementation(projects.baseServicesGroovy)
     implementation(projects.logging)
@@ -40,15 +42,19 @@ dependencies {
     implementation(libs.commonsLang)
     implementation(libs.slf4jApi)
 
+    // Runtime dependencies
     runtimeOnly(libs.kotlinReflect)
 
+    // Test dependencies
     testImplementation(libs.asm)
     testImplementation(libs.asmCommons)
     testImplementation(testFixtures(projects.core))
     testImplementation(testFixtures(projects.logging))
 
+    // Test fixtures
     testFixturesImplementation(projects.baseServices)
 
+    // Integration test dependencies
     integTestDistributionRuntimeOnly(projects.distributionsBasics)
 }
 
@@ -57,11 +63,12 @@ packageCycles {
 }
 
 strictCompile {
-    ignoreRawTypes() // raw types used in public API
+    ignoreRawTypes() // Raw types used in public API
 }
 
 integTest.usesJavadocCodeSnippets = true
 testFilesCleanup.reportOnly = true
+
 tasks.isolatedProjectsIntegTest {
     enabled = false
 }
